@@ -1,0 +1,7 @@
+client/.idea/**/*
+server/.idea/**/*
+client/build/**/*
+server/client/**/*
+
+client/node_modules/
+server/node_modules/

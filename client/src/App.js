@@ -1,72 +1,37 @@
 import React, { Component } from 'react';
+import { observer } from "mobx-react";
 import AppStore from "./AppStore";
 import AuthService from "./components/AuthService/AuthService";
 import withAuth from "./components/withAuth/withAuth";
 import SingleInput from "./components/SingleInput/SingleInput";
 import Status from "./components/Status/Status";
 import './App.css';
+
 const Auth = new AuthService();
 
+@observer
 class App extends Component {
   constructor(props) {
     super(props);
-  /*  this.state= {
-      login: "",
-      password: "",
-      status: {
-       fullName: "",
-        light: "",
-        gas: "",
-        water: ""
-      }
-    };*/
+    this.handleFormSubmit = this.handleFormSubmit.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
-  /* componentDidMount() {
-     // simulating a call to retrieve user data
-     // (create-react-app comes with fetch polyfills!)
-     fetch('http://localhost:3000/kek', {
-       method: 'post',
-       headers: {
-         'Accept': 'application/json, text/plain, *!/!*',
-         'Content-Type': 'application/json'
-       },
-       body: JSON.stringify({a: 7, str: 'Строка: &=&'})}).then(res=>res.json())
-       .then(res => console.log(res));
-   }*/
-
-  handleLogout(){
+  handleLogout() {
     Auth.logout();
     this.props.history.replace("/login");
   }
 
-  /*handleLoginChange = (e) => {
-    this.setState({ login: e.target.value });
-  };*/
-
-  /*handlePasswordChange = (e) => {
-    this.setState({ password: e.target.value });
-  };*/
-
-  clearForm (e){
+  clearForm = (e) => {
     e.preventDefault();
+
     AppStore.clearForm(e);
-    /*this.setState({
-      login: "",
-      password: "",
-      status: {
-        fullName: "",
-        light: "",
-        gas: "",
-        water: ""
-      }
-    })*/
   };
 
   handleFormSubmit(e) {
     e.preventDefault();
     let token = localStorage.getItem("id_token");
-    if(token !== null )
+    if (token !== null)
       token = "Bearer " + localStorage.getItem("id_token");
     fetch("/db", {
       method: "POST",
@@ -74,30 +39,19 @@ class App extends Component {
         "Content-Type": "application/json",
         "Authorization": token
       },
-      body: JSON.stringify(this.state)
+      body: JSON.stringify(AppStore.personInfo)
     })
       .then((response) => {
         return response.json();
       })
       .then((response) => {
         if (response.status === 200) {
-          AppStore({
-            status: {
-              fullName: response.user.firstName + " " + response.user.lastName,
-              light: "light: " + response.user.meter.light,
-              gas: "gas:" + response.user.meter.gas,
-              water: "water:" + response.user.meter.water
-            }
-          });
+          AppStore.setSuccessStatus(response);
         } else if (response.status === 404) {
-          AppStore({
-            status: {
-              fullName: "Not found X_X"
-            }
-          });
-        } else if(response.status === 403) {
-            localStorage.removeItem("id_token");
-            this.props.history.push("/login");
+          AppStore.setNotFoundStatus();
+        } else if (response.status === 403) {
+          localStorage.removeItem("id_token");
+          this.props.history.push("/login");
         }
       })
       .catch((err) => {
@@ -113,14 +67,14 @@ class App extends Component {
           title={"Login:  "}
           name={"loginField"}
           inputType={"text"}
-          value={AppStore.login}
+          value={AppStore.personInfo.login}
           controlFunc={AppStore.handleLoginChange}
           placeholder={"Login"} />
         <SingleInput
           title={"Pass : "}
           name={"passwordField"}
           inputType={"password"}
-          value={AppStore.password}
+          value={AppStore.personInfo.password}
           controlFunc={AppStore.handlePasswordChange}
           placeholder={"Password"} />
         <input
@@ -128,9 +82,9 @@ class App extends Component {
           className={"frmSubmitBtn"}
           value={"Submit"} />
         <button className={"btnClearForm"} onClick={this.clearForm}> Clear form</button>
-        {/*<Status status={AppStore.status} />*/}
+        <Status status={AppStore.personInfo.status} />
         <p className="App-login">
-          <button type="button" className="form-submit" onClick={this.handleLogout}> Logout </button>
+          <button type="button" className="form-submit" onClick={this.handleLogout}> Logout</button>
         </p>
       </form>
     )

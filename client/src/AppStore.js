@@ -1,11 +1,10 @@
-import { extendObservable } from "mobx";
-
-//import { observer } from "mobx-react";
-
+import { observable, computed, action } from "mobx";
 
 class AppStore {
+  @observable personInfo;
+
   constructor() {
-    extendObservable(this, {
+    this.personInfo = {
       login: "",
       password: "",
       status: {
@@ -14,20 +13,41 @@ class AppStore {
         gas: "",
         water: ""
       }
-    })
-  }
+    };
+    this.handleLoginChange = this.handleLoginChange.bind(this);
+    this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.clearForm = this.clearForm.bind(this);
+  };
 
+  setSuccessStatus = (response) => {
+    this.personInfo.status = {
+      fullName: response.user.firstName + " " + response.user.lastName,
+      light: "light: " + response.user.meter.light,
+      gas: "gas:" + response.user.meter.gas,
+      water: "water:" + response.user.meter.water
+    };
+  };
 
+  setNotFoundStatus = () => {
+    this.personInfo.status = {
+      fullName: "Not found X_X"
+    };
+  };
+
+  //getLogin
+  @action
   handleLoginChange = (e) => {
-    this.login = e.target.value;
+    e.preventDefault();
+    this.personInfo.login = e.target.value;
   };
 
-  handlePasswordChange(e) {
-    this.password = e.target.value;
+  handlePasswordChange = (e) => {
+    e.preventDefault();
+    this.personInfo.password = e.target.value;
   };
 
-  clearForm = (e) => {
-    this({
+  clearForm = () => {
+    this.personInfo = {
       login: "",
       password: "",
       status: {
@@ -36,8 +56,9 @@ class AppStore {
         gas: "",
         water: ""
       }
-    })
+    }
   };
 }
 
 export default new AppStore();
+export { AppStore };

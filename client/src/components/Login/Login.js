@@ -11,22 +11,22 @@ class Login extends Component {
     this.Auth = new AuthService();
   }
 
-  handleFormSubmit(e){
+  handleFormSubmit(e) {
     e.preventDefault();
 
     this.Auth.login(this.state.username, this.state.password)
       .then(res => {
         this.props.history.push("/");
-      }).catch(err => {
-        alert(err);
+      })
+      .catch(err => {
+      alert(err);
     })
   }
 
-  componentWillMount(){
-    if(this.Auth.loggedIn())
+  componentWillMount() {
+    if (this.Auth.loggedIn())
       this.props.history.push("/");
   }
-
 
   render() {
     return (

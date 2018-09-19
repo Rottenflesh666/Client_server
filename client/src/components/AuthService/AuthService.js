@@ -21,10 +21,10 @@ export default class AuthService {
     });
   }
 
-  loggedIn() {
+  loggedIn = () => {
     const token = localStorage.getItem("id_token");
     return !!token && !AuthService.isTokenExpired(token);
-  }
+  };
 
   static isTokenExpired(token) {
     try {

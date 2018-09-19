@@ -30,6 +30,7 @@ export default new Config().merge({
       }
     ]
   },
+  devtool: 'cheap-module-eval-source-map',
   plugins: [
     new HtmlWebpackPlugin({
       template: Path.join(__dirname + '/../index.html'),
